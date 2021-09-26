@@ -1122,7 +1122,7 @@ static void osdElementLinkQuality(osdElementParms_t *element)
     if (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_CRSF) { // 0-99
         osdLinkQuality = rxGetLinkQuality();
         const uint8_t osdRfMode = rxGetRfMode();
-        tfp_sprintf(element->buff, "LQ %1d:%2d", osdRfMode, osdLinkQuality);
+        tfp_sprintf(element->buff, "LQ %1d:%03d %3d", osdRfMode, osdLinkQuality, getRssiDbm());
     } else if (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_GHST) { // 0-100
         osdLinkQuality = rxGetLinkQuality();
         tfp_sprintf(element->buff, "%c%2d", SYM_LINK_QUALITY, osdLinkQuality);
