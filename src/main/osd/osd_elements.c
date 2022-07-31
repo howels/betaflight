@@ -1476,6 +1476,36 @@ static void osdElementWarnings(osdElementParms_t *element)
     }
 }
 
+static void osdElementMSPCraftNameHack(osdElementParms_t *element)
+// Injects data into the MSP CraftName variable for systems which limit
+// the available MSP data field in their OSD.
+{
+    osdElementWarnings(element);
+
+    if (blinkState || (strlen(element->buff) == 0)) {
+        #ifdef USE_RX_LINK_QUALITY_INFO
+        uint16_t osdLinkQuality = 0;
+        if (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_CRSF) { // 0-99
+            osdLinkQuality = rxGetLinkQuality();
+            const uint8_t osdRfMode = rxGetRfMode();
+            tfp_sprintf(element->buff, "LQ %2d:%03d %3d", osdRfMode, osdLinkQuality, getRssiDbm());
+        } else if (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_GHST) { // 0-100
+            osdLinkQuality = rxGetLinkQuality();
+            tfp_sprintf(element->buff, "LQ %03d %3d", osdLinkQuality, getRssiDbm());
+        } else { // 0-9
+            osdLinkQuality = rxGetLinkQuality() * 10 / LINK_QUALITY_MAX_VALUE;
+            if (osdLinkQuality >= 10) {
+                osdLinkQuality = 9;
+            }
+            tfp_sprintf(element->buff, "LQ %1d", osdLinkQuality);
+        }
+        #endif // USE_RX_LINK_QUALITY_INFO
+    }
+
+    strncpy(pilotConfigMutable()->name, element->buff, 12);
+    return;
+}
+
 // Define the order in which the elements are drawn.
 // Elements positioned later in the list will overlay the earlier
 // ones if their character positions overlap
@@ -1592,7 +1622,11 @@ const osdElementDrawFn osdElementDrawFunction[OSD_ITEM_COUNT] = {
     [OSD_YAW_PIDS]                = osdElementPidsYaw,
     [OSD_POWER]                   = osdElementPower,
     [OSD_PIDRATE_PROFILE]         = osdElementPidRateProfile,
+#ifdef USE_MSP_CRAFTNAME_HACK
+    [OSD_WARNINGS]                = osdElementMSPCraftNameHack,
+#else
     [OSD_WARNINGS]                = osdElementWarnings,
+#endif
     [OSD_AVG_CELL_VOLTAGE]        = osdElementAverageCellVoltage,
 #ifdef USE_GPS
     [OSD_GPS_LON]                 = osdElementGpsCoordinate,
