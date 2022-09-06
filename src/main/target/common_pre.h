@@ -57,7 +57,7 @@
 
 #ifdef STM32F7
 #define USE_ITCM_RAM
-#define ITCM_RAM_OPTIMISATION "-O2"
+#define ITCM_RAM_OPTIMISATION "-O2", "-freorder-blocks-algorithm=simple"
 #define USE_FAST_DATA
 #define USE_DSHOT
 #define USE_DSHOT_BITBANG
@@ -407,6 +407,7 @@ extern uint8_t _dmaram_end__;
 #define USE_SIMPLIFIED_TUNING
 #define USE_RX_LINK_UPLINK_POWER
 #define USE_CRSF_V3
+#define USE_CRAFTNAME_MSGS
 #endif
 
 #if (TARGET_FLASH_SIZE > 512)
